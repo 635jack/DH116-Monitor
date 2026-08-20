@@ -9,9 +9,8 @@ bibliothèque standard. Le paquet Python s'appelle `dh116`.
 [![Interface temps réel pour la DH116](https://img.youtube.com/vi/f69M3WfV_O4/hqdefault.jpg)](https://youtu.be/f69M3WfV_O4)
 
 <https://youtu.be/f69M3WfV_O4> — retour tactile en direct et pilotage des
-doigts, avec la main réelle en incrustation. La vidéo montre une interface web
-bâtie sur la même bibliothèque ; **ce dépôt-ci ne contient que les commandes en
-ligne de commande**, qui en sont le socle.
+doigts, avec la main réelle en incrustation. C'est l'interface `dh116-web` de ce
+dépôt.
 
 Le SDK constructeur ne sert qu'à trois choses : monter EtherCAT, réveiller la
 main, et basculer ses trames en mode capteur. **Le contenu des trames est
@@ -19,10 +18,11 @@ décodé ici**, à partir d'une table établie par la mesure — pas par lecture
 binaire du SDK, qui lit ses champs un octet trop tôt et rend en conséquence une
 proximité constante à 1,00 et une force normale erronée.
 
-## Trois commandes
+## Quatre commandes
 
 | commande | rôle |
 | :--- | :--- |
+| `dh116-web` | interface web : tactile en direct et pilotage, dans un navigateur |
 | `dh116-tactile` | pression des neuf zones tactiles, en direct dans le terminal |
 | `dh116-pilote` | pilotage des moteurs, interactif |
 | `dh116-diagnostic` | les moteurs répondent-ils ? réponse en un tableau, code de sortie exploitable |
@@ -80,6 +80,34 @@ sudo python3 -m dh116.cli.pilote --sdk-dir /opt/LHandProLib/sdk_lib
 ```
 
 ## Usage
+
+### L'interface web
+
+```bash
+sudo python3 -m dh116.cli.web --port 8080
+```
+
+Puis `http://<machine>:8080`. C'est ce que montre la vidéo : les neuf zones sur
+une main dessinée, les 26 points de paume, les courants, et des curseurs pour
+chaque moteur avec quelques poses prêtes à l'emploi.
+
+La page ne parle que **HTTP et Server-Sent Events** — pas de websockets, pas de
+rosbridge, aucune dépendance : un serveur de la bibliothèque standard et une
+page autonome, CSS et JavaScript compris dedans.
+
+Deux comportements attendus, à ne pas prendre pour des défauts :
+
+* La **position affichée ne se rafraîchit qu'une fois le mouvement terminé**.
+  La télémétrie n'est pas interrogée pendant le déplacement : l'affichage reste
+  sur son ancienne valeur puis saute à la position finale. La main, elle, se
+  déplace continûment — c'est visible dans la vidéo.
+* Un doigt immobile qui tire plus de 500 ‰ est déclaré **bloqué** : la commande
+  n'est pas relancée, et le moteur apparaît dans `bloques`. C'est un obstacle
+  mécanique, pas une commande perdue.
+
+La machine n'est joignable que depuis elle-même par défaut. Pour y accéder
+d'ailleurs, `--host 0.0.0.0` — en sachant que **l'interface n'a aucune
+authentification** : quiconque atteint le port peut refermer les doigts.
 
 ### Lire le tactile
 

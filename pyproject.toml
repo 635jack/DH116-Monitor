@@ -21,9 +21,14 @@ dev = ["pytest>=7"]
 dh116-tactile = "dh116.cli.tactile:main"
 dh116-pilote = "dh116.cli.pilote:main"
 dh116-diagnostic = "dh116.cli.diagnostic:main"
+dh116-web = "dh116.cli.web:main"
 
 [tool.setuptools.packages.find]
 include = ["dh116*"]
+
+# La page de l'interface web est servie depuis le paquet.
+[tool.setuptools.package-data]
+"dh116.cli" = ["static/*.html"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
