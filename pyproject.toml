@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dh116"
+version = "1.0.0"
+description = "Pilotage et lecture tactile de la main DH-Robotics DH116, en ligne de commande, sans ROS"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+# Rien hors bibliothèque standard : le décodage tactile et le pilotage
+# n'utilisent que ctypes, threading et socket. Le SDK constructeur est chargé
+# à l'exécution, il n'est pas une dépendance de paquet.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+dh116-tactile = "dh116.cli.tactile:main"
+dh116-pilote = "dh116.cli.pilote:main"
+dh116-diagnostic = "dh116.cli.diagnostic:main"
+
+[tool.setuptools.packages.find]
+include = ["dh116*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
